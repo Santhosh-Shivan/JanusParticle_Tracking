@@ -1,0 +1,73 @@
+class DarkBrightParticle(dt.Feature):
+
+    def get(self, image, position, radius, intensityOfBright, rotation, **kwargs):
+        X, Y = np.meshgrid(np.arange(image.shape[0]), np.arange(image.shape[1]))
+        mask = ((X - position[0]) ** 2 + (Y - (position[1])) ** 2 <= radius ** 2)*1.0
+
+        line_center = [position[0] + radius * rotation[1] / (np.pi / 2) * np.sin(rotation[0]),
+                           position[1] + radius * rotation[1] / (np.pi / 2) * np.cos(rotation[0])]
+        # rotation[1] 0 to 90
+        if rotation[1] >= 0 and rotation[1] <= np.pi / 2:
+            
+            
+
+            if np.sin(rotation[0]) == 1:
+                for y in range(image.shape[1]):
+                    for x in range(image.shape[0]):
+                        if mask[y, x]:
+                            if x >= line_center[0]:
+                                mask[y, x] = intensityOfBright
+            elif np.sin(rotation[0]) == -1:
+                for y in range(image.shape[1]):
+                    for x in range(image.shape[0]):
+                        if mask[y, x]:
+                            if x <= line_center[0]:
+                                mask[y, x] = intensityOfBright
+            else:
+                for y in range(image.shape[0]):
+                    for x in range(image.shape[1]):
+                        if mask[y, x]:
+                            if (np.sin(rotation[0]) >= 0 and np.cos(rotation[0]) > 0) or (
+                                    np.sin(rotation[0]) < 0 and np.cos(rotation[0]) > 0):
+                                if (y - (line_center[1])) > np.tan(np.pi - rotation[0]) * (x - (line_center[0])):
+                                    mask[y, x] = intensityOfBright
+                            elif (np.sin(rotation[0]) >= 0 and np.cos(rotation[0]) < 0) or (
+                                    np.sin(rotation[0]) < 0 and np.cos(rotation[0]) < 0):
+                                if (y - (line_center[1])) < np.tan(np.pi - rotation[0]) * (x - (line_center[0])):
+                                    mask[y, x] = intensityOfBright
+
+        
+        # rotation[1] -90 to 0
+        if rotation[1] < 0  and rotation[1] >= -1* np.pi/2:
+            
+            """line_center = [position[0] - radius*(-1*rotation[1])/(np.pi / 2)*np.sin(rotation[0]), 
+                           position[1] - radius*(-1*rotation[1])/(np.pi / 2)*np.cos(rotation[0])]"""
+
+
+            if np.sin(rotation[0]) == 1:
+                for y in range(image.shape[1]):
+                    for x in range(image.shape[0]):
+                        if mask[y, x]:
+                            if x >= line_center[0]:
+                                mask[y, x] = intensityOfBright
+            elif np.sin(rotation[0]) == -1:
+                for y in range(image.shape[1]):
+                    for x in range(image.shape[0]):
+                        if mask[y, x]:
+                            if x <= line_center[0]:
+                                mask[y, x] = intensityOfBright
+            else:
+                for y in range(image.shape[0]):
+                    for x in range(image.shape[1]):
+                        if mask[y, x]:
+                            if (np.sin(rotation[0]) >= 0 and np.cos(rotation[0]) > 0) or (
+                                    np.sin(rotation[0]) < 0 and np.cos(rotation[0]) > 0):
+                                if (y - (line_center[1])) > -1*np.tan(rotation[0]) * (x - (line_center[0])):
+                                    mask[y, x] = intensityOfBright
+                            elif (np.sin(rotation[0]) >= 0 and np.cos(rotation[0]) < 0) or (np.sin(rotation[0]) < 0 and np.cos(rotation[0]) < 0):
+                                if (y - (line_center[1])) < -1*np.tan(rotation[0] ) * (x - (line_center[0])):
+                                    mask[y, x] = intensityOfBright
+
+        mask  = -1*(mask - 1)
+        
+        return mask
